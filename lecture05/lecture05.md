@@ -91,7 +91,7 @@ $ yarn --version
 `$ gem install bundler:2.3.14`
 - Bundlerのインストール完了
 
-![bundlerVersion](lecture05-picture/bundlerVersion.png)
+![bundlerVersion](lecture05-picture/Bundler.png)
 
 ## EC2インスタンスにデプロイ
 #### 1.  ディレクトリの作成
@@ -441,7 +441,7 @@ gem 'aws-sdk-s3'
 
 - S3に画像が保存されている
 
-![S3に画像が保存されている](lecture05-picture/S3に画像が保存されている.png)
+![S3に画像が保存されている](lecture05-picture/S3pictureSave.png)
 
 
 ## エラー
