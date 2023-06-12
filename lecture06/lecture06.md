@@ -13,10 +13,20 @@
  ### 最後に利用したAWSの記録をCloudTrailのイベントから探し出す
  - イベントの情報をピックアップする(イベント名と含まれている内容)
    - イベント名： CreateBucket(S3バケットの作成)
-   - 内容： イベント、ユーザー名、イベントソース
+   - 内容： イベント、ユーザー名、イベントソース、リージョン他
    
   ![CroudTrail](lecture06-picture/cloudTrail.png)
- 
+  
+   - イベント名： CreateSecurityGroup(セキュリティグループの作成)
+   - 内容： イベント、ユーザー名、イベントソース、リージョン他
+   
+  ![CroudTrail2](lecture06-picture/cloudTrail2.png)
+   
+   - イベント名： DeleteVPC(VPCの削除)
+   - 内容： イベント、ユーザー名、イベントソース、リージョン他
+   
+  ![CroudTrail3](lecture06-picture/cloudTrail3.png)
+  
   
  ## CroudWacth
  ### CloudWatchアラームを使ってALBのアラームを設定してメールを通知する
