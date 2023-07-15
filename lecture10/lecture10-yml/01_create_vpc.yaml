@@ -1,0 +1,148 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Resources: 
+
+# VPC Create
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: CloudFormation-vpc
+
+
+# PubricSubnet Create
+  PubricSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Sub ${AWS::Region}a
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.0.0/20
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: CloudFormation-public-subnet-1a
+  PubricSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Sub ${AWS::Region}c
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.16.0/20
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: CloudFormation-public-subnet-1c
+
+# PrivateSubnet Create
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Sub ${AWS::Region}a
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.128.0/20
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: CloudFormation-private-subnet-1a
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Sub ${AWS::Region}c
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.144.0/20
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: CloudFormation-private-subnet-1c
+
+
+# RouteTable Create
+  PubricRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: CloudFormation-public-rtb
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: CloudFormation-private-rtb
+
+  PubricSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PubricSubnet1
+      RouteTableId: !Ref PubricRouteTable
+  PubricSubnet2CRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PubricSubnet2
+      RouteTableId: !Ref PubricRouteTable
+  PrivateSubnet1CRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnet1
+      RouteTableId: !Ref PrivateRouteTable
+  PrivateSubnet2CRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnet2
+      RouteTableId: !Ref PrivateRouteTable    
+
+
+
+# InternetGateway Create
+  InternetGateway:
+    Type: "AWS::EC2::InternetGateway"
+    Properties:
+      Tags:
+        - Key: Name
+          Value: CloudFormation-igw
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+  Route:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PubricRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway    
+
+
+
+# Outputs       
+Outputs:
+  StackVPC:
+    Value: !Ref VPC
+    Export:
+      Name: CloudFormation-vpc
+
+  StackPubricSubnet1:
+    Description: The ID of the VPC Subnet
+    Value: !Ref PubricSubnet1
+    Export:
+      Name: CloudFormation-public-subnet-1a
+  StackPubricSubnet2:
+    Description: The ID of the VPC Subnet
+    Value: !Ref PubricSubnet2
+    Export:
+      Name: CloudFormation-public-subnet-1c
+  StackPrivateSubnet1:
+    Description: The ID of the VPC Subnet
+    Value: !Ref PrivateSubnet1
+    Export:
+      Name: CloudFormation-private-subnet-1a
+  StackPrivateSubnet2:
+    Description: The ID of the VPC Subnet
+    Value: !Ref PrivateSubnet2
+    Export:
+      Name: CloudFormation-private-subnet-1c

@@ -1,0 +1,82 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Parameters:
+  MasterUserName:
+    NoEcho: 'true'
+    Default: root
+    Type: String
+  MasterUserPassword:
+    NoEcho: 'true'
+    Default: {RDSのパスワードを記載}
+    Type: String
+  EngineVersion:
+    Default: 8.0.28
+    Type: String
+  StorageType:
+    Default: gp2
+    Type: String
+  InstanceClass:
+    Default: db.t2.micro
+    Type: String
+  StorageSize:
+    Default: 20
+    Type: String
+
+Resources:
+# RDS Security Groups
+  RDSSg1:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: connect with ssh and mysql
+      VpcId: !ImportValue CloudFormation-vpc
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          SourceSecurityGroupId: !ImportValue CloudFormation-ec2-sg
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          SourceSecurityGroupId: !ImportValue CloudFormation-ec2-sg
+      Tags:
+        - Key: Name
+          Value: CloudFormation-rds-sg
+          
+          
+# DB SubnetGroup
+  DBSubnetGroup1:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: CFn DB SubnetGroup
+      DBSubnetGroupName: CloudFormation-rds-sng
+      SubnetIds:
+        - !ImportValue CloudFormation-private-subnet-1a
+        - !ImportValue CloudFormation-private-subnet-1c
+      Tags:
+        - Key: Name
+          Value: CloudFormation-rds-sng
+
+
+# RDS Create
+  RDSInstance1:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      Engine: mysql
+      EngineVersion: !Ref EngineVersion
+      DBInstanceClass: !Ref InstanceClass
+      AllocatedStorage: !Ref StorageSize
+      StorageType: !Ref StorageType
+      DBName: CloudFormation_rds
+      MasterUsername: !Ref MasterUserName
+      MasterUserPassword: !Ref MasterUserPassword
+      VPCSecurityGroups:
+        - !Ref RDSSg1
+      DBSubnetGroupName: !Ref DBSubnetGroup1
+      MultiAZ: "false"
+      AvailabilityZone: !Sub ${AWS::Region}a
+      Tags:
+        - Key: Name
+          Value: CloudFormation-rds
+
+        
+    
